@@ -360,9 +360,6 @@ Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)-
 
 Route::get('warehouses/{warehouse}/items', [WarehouseItemController::class, 'index'])->name('warehouse.items');
 
-Route::get('/businesses/modal', [BusinessController::class, 'showBusinessModal']);
-
 Route::get('/businesses/modal', [BusinessController::class, 'modal']);
-
 
 require __DIR__.'/auth.php';
