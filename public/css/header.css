@@ -1,0 +1,161 @@
+:root {
+    --header-height: 60px;
+    --header-bg-light: #ffffff;
+    --header-bg-dark: #1a1c23;
+    --header-text-light: #26344d;
+    --header-text-dark: #e2e8f0;
+    --header-border-light: #e4e8ef;
+    --header-border-dark: #2d3748;
+    --header-shadow-light: rgba(44,62,80,.09);
+    --header-shadow-dark: rgba(0,0,0,.2);
+}
+
+/* Header Base */
+.main-header {
+    height: var(--header-height);
+    background: var(--header-bg-light);
+    border-bottom: 1px solid var(--header-border-light);
+    box-shadow: 0 2px 15px var(--header-shadow-light);
+    z-index: 1030;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    color: var(--header-text-light);
+    font-size: 1.25rem;
+    transition: color 0.3s ease;
+}
+
+.nav-link {
+    color: var(--header-text-light);
+    transition: color 0.3s ease;
+}
+
+/* Sales Summary */
+.sales-summary {
+    cursor: pointer;
+}
+
+.sales-badge {
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #1976d2, #64b5f6);
+    color: white;
+}
+
+.sales-chart-popup {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 35px;
+    background: var(--header-bg-light);
+    border-radius: 15px;
+    border: 1px solid var(--header-border-light);
+    z-index: 2000;
+}
+
+#sales-hourly-chart {
+    width: 330px;
+    height: 210px;
+}
+
+/* Notifications */
+.notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 0.25em 0.6em;
+    font-size: 0.75em;
+}
+
+.dropdown-menu {
+    min-width: 300px;
+    background: var(--header-bg-light);
+    border: 1px solid var(--header-border-light);
+    box-shadow: 0 5px 15px var(--header-shadow-light);
+}
+
+.dropdown-item {
+    color: var(--header-text-light);
+    transition: all 0.2s ease;
+}
+
+/* Theme Switch */
+.theme-switch .btn {
+    padding: 0.5rem;
+    color: var(--header-text-light);
+    transition: all 0.3s ease;
+}
+
+.theme-icon-light,
+.theme-icon-dark {
+    font-size: 1.2rem;
+}
+
+.theme-icon-dark {
+    display: none;
+}
+
+/* Dark Theme */
+body.dark-theme .main-header {
+    background: var(--header-bg-dark);
+    border-bottom-color: var(--header-border-dark);
+    box-shadow: 0 2px 15px var(--header-shadow-dark);
+}
+
+body.dark-theme .navbar-brand,
+body.dark-theme .nav-link {
+    color: var(--header-text-dark);
+}
+
+body.dark-theme .sales-chart-popup {
+    background: var(--header-bg-dark);
+    border-color: var(--header-border-dark);
+}
+
+body.dark-theme .dropdown-menu {
+    background: var(--header-bg-dark);
+    border-color: var(--header-border-dark);
+    box-shadow: 0 5px 15px var(--header-shadow-dark);
+}
+
+body.dark-theme .dropdown-item {
+    color: var(--header-text-dark);
+}
+
+body.dark-theme .theme-icon-light {
+    display: none;
+}
+
+body.dark-theme .theme-icon-dark {
+    display: inline-block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sales-badge {
+        font-size: 0.8em;
+        padding: 0.4em 0.8em;
+    }
+
+    .sales-chart-popup {
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+    }
+
+    #sales-hourly-chart {
+        width: 280px;
+        height: 180px;
+    }
+}
+nav#main-header {
+    margin-left: unset;
+}
