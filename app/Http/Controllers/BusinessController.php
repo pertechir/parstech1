@@ -33,4 +33,9 @@ class BusinessController extends Controller
 
         return redirect()->route('dashboard');
     }
+    public function modal()
+{
+    $provinces = \App\Models\Province::all();
+    return view('businesses.modal', compact('provinces'));
+}
 }
