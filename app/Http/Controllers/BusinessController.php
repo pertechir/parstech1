@@ -3,30 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tenant;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Business;
+use Stancl\Tenancy\Database\Models\Tenant;
 
 class BusinessController extends Controller
 {
-    public function select()
+    // لیست کسب‌وکارهای کاربر جاری
+    public function index()
     {
         $businesses = Auth::user()->businesses;
-        return view('businesses.select', compact('businesses'));
-    }
-
-    public function switch($tenant_id)
-    {
-        $tenant = Tenant::findOrFail($tenant_id);
-
-        if (!Auth::user()->businesses->contains($tenant)) {
-            abort(403, 'شما به این کسب‌وکار دسترسی ندارید.');
-        }
-
-        tenancy()->initialize($tenant);
-
-        session(['tenant_id' => $tenant_id]);
-
-        return redirect()->route('dashboard');
+        return view('businesses.index', compact('businesses'));
     }
 
     // نمایش فرم ایجاد کسب‌وکار جدید
@@ -39,22 +26,36 @@ class BusinessController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:businesses',
         ]);
 
+        // ساخت tenant و دیتابیس جدید (اتوماتیک با پکیج tenancy)
         $tenant = Tenant::create([
-            'id' => uniqid(), // یا هر الگویی که دوست داری
+            'id' => uniqid('business_'),
             'data' => [
                 'name' => $request->name,
+                'user_id' => Auth::id(),
             ],
         ]);
-        // نسبت دادن کاربر به tenant
-        Auth::user()->businesses()->attach($tenant->id);
+        // اینجا جداول tenant اتوماتیک ساخته می‌شوند (اگر config تنظیم باشد)
 
-        // ایجاد دیتابیس و اجرای مایگریشن
-        $tenant->createDatabase();
-        $tenant->runMigrations();
+        // اتصال کسب‌وکار به کاربر
+        $business = Business::create([
+            'name' => $request->name,
+            'user_id' => Auth::id(),
+            'tenant_id' => $tenant->id,
+        ]);
 
-        return redirect()->route('business.select')->with('success', 'کسب‌وکار جدید با موفقیت ایجاد شد.');
+        return redirect()->route('businesses.index')->with('success', 'کسب‌وکار جدید ایجاد شد.');
+    }
+
+    // سوییچ به یک کسب‌وکار (tenant)
+    public function switch($id)
+    {
+        $business = Business::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+        session(['tenant_id' => $business->tenant_id]);
+
+        return redirect('/dashboard')->with('success', 'به کسب‌وکار ' . $business->name . ' سوییچ شد.');
     }
 }
