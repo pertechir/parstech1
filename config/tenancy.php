@@ -83,6 +83,9 @@ return [
     ],
 
     'features' => [
+        Stancl\Tenancy\Features\TenantMigration::class,
+        Stancl\Tenancy\Features\TenantConfig::class, // اگر نیاز داری
+        Stancl\Tenancy\Features\UserImpersonation::class, // اگر نیاز داری
         // Stancl\Tenancy\Features\UserImpersonation::class,
         // Stancl\Tenancy\Features\TelescopeTags::class,
         // Stancl\Tenancy\Features\UniversalRoutes::class,

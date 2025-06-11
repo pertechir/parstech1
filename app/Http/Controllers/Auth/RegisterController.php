@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Tenant;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
+    // نمایش فرم ثبت نام
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
+    // پردازش ثبت نام کاربر
     public function register(Request $request)
     {
         $request->validate([
@@ -25,29 +25,17 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        // ساخت کاربر
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // ساخت اولین کسب‌وکار برای کاربر
-        $tenant = Tenant::create([
-            'id' => uniqid(), // یا هر الگویی که دوست داری
-            'data' => [
-                'name' => $user->name . ' کسب‌وکار',
-            ],
-        ]);
-        // نسبت دادن کاربر به tenant
-        $user->businesses()->attach($tenant->id);
-
-        // ایجاد دیتابیس tenant
-        $tenant->createDatabase();
-
+        // ورود خودکار کاربر
         Auth::login($user);
-        event(new Registered($user));
 
-        // بعد ثبت‌نام، کاربر را به صفحه ساخت کسب‌وکار جدید یا داشبورد بفرست
-        return redirect()->route('business.select');
+        // ری‌دایرکت به لیست کسب‌وکارها تا کاربر اولین کسب‌وکارش را بسازد
+        return redirect()->route('businesses.index')->with('success', 'ثبت‌نام با موفقیت انجام شد! حالا کسب‌وکار جدید خود را بسازید.');
     }
 }
