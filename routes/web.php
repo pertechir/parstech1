@@ -38,6 +38,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WarehouseItemController;
+use App\Http\Controllers\BusinessController;
 
 // بخش های غیر از دسته بندی بدون تغییر -------------------------------
 Route::resource('persons', PersonController::class);
@@ -359,9 +360,9 @@ Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)-
 
 Route::get('warehouses/{warehouse}/items', [WarehouseItemController::class, 'index'])->name('warehouse.items');
 
+Route::get('/businesses/modal', [BusinessController::class, 'showBusinessModal']);
 
-
-
+Route::get('/businesses/modal', [BusinessController::class, 'modal']);
 
 
 require __DIR__.'/auth.php';

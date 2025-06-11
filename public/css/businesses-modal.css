@@ -1,0 +1,146 @@
+#businesses-modal {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 3000;
+    display: none;
+}
+.businesses-modal-bg {
+    background: rgba(0,0,0,0.85);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top:0; left:0;
+    z-index: 3010;
+}
+.businesses-modal-content {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 3050;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+.btn-close-modal {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+    z-index: 3100;
+    min-width: 85px;
+}
+.business-modal-steps-absolute {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top:0; left:0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3200;
+}
+.business-form-steps {
+    background: #fff;
+    border-radius: 2.2rem;
+    max-width: 900px;
+    min-width: 340px;
+    width: 92vw;
+    min-height: 570px;
+    height: 94vh;
+    box-shadow: 0 0 32px #0002;
+    padding: 2.5rem 2.2rem 1.5rem 2.2rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+}
+#business-steps {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: 68vh;
+    margin-top: 1.2rem;
+}
+.business-step { min-height: 350px; }
+.steps-progressbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    direction: ltr !important;
+    padding: 0;
+    margin:0;
+    margin-bottom:2rem;
+    list-style:none;
+}
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    color: #aaa;
+    position: relative;
+    transition: color 0.2s;
+}
+.step-item.active, .step-item.done { color: #2196F3; }
+.step-item .circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #888;
+    margin-bottom: 5px;
+    border: 2px solid #e9ecef;
+    transition: all 0.2s;
+}
+.step-item.active .circle {
+    background: #2196F3;
+    color: #fff;
+    border-color: #2196F3;
+    font-weight: bold;
+}
+.step-item.done .circle {
+    background: #43a047;
+    color: #fff;
+    border-color: #43a047;
+    font-weight: bold;
+}
+.step-label { font-size: 0.95rem; font-weight: 500; }
+.step-separator {
+    flex: 1;
+    height: 3px;
+    background: #e0e0e0;
+    margin: 0 8px;
+    border-radius: 2px;
+    position: relative;
+    top: 14px;
+}
+@media (max-width: 900px) {
+    .business-form-steps { max-width:99vw !important; }
+}
+@media (max-width: 700px) {
+    .business-form-steps {
+        max-width: 99vw !important;
+        min-height: 350px !important;
+        padding: 1rem 4px 2rem 4px !important;
+        border-radius: 1rem;
+    }
+    .steps-progressbar .step-label { font-size: 0.8rem; }
+    .step-item { min-width: 60px; }
+    #businesses-modal input, #businesses-modal select { min-height: 36px; font-size:0.95rem;}
+    #business-steps { max-height: 50vh; }
+    .row.g-4 > .col-md-6, .row.g-4 > .col-md-4 { padding-right:0; padding-left:0; }
+}
+@media (max-width: 600px) {
+    .row.g-4 > .col-md-6, .row.g-4 > .col-md-4 { width:100% !important; display:block; }
+    .business-form-steps { padding: 1rem !important;}
+    #businesses-modal .row.g-4 { flex-direction:column; }
+}
