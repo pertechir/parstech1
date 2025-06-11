@@ -57,30 +57,28 @@
     <div id="business-modal-container"></div>
 </nav>
 
-<!-- لود پاپ‌آپ کسب‌وکارها و استایل و اسکریپت مرتبط -->
-@include('businesses.modal')
+
 <link rel="stylesheet" href="{{ asset('css/businesses-modal.css') }}">
-<script src="{{ asset('js/businesses-modal.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        document.getElementById('businesses-btn').addEventListener('click', function(){
-            // اگر قبلاً لود نشده
-            if (!document.getElementById('businesses-modal')) {
-                fetch('/businesses/modal')
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('business-modal-container').innerHTML = html;
-                    });
-            } else {
-                document.getElementById('businesses-modal').style.display = 'block';
-            }
-        });
-        // بستن مودال (این اگر در modal.blade.php نیست، اضافه کن)
-        document.addEventListener('click', function(e){
-            if(e.target.id === 'close-businesses-modal' || e.target.className === 'businesses-modal-bg'){
-                document.getElementById('businesses-modal').style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        });
+document.addEventListener('DOMContentLoaded', function(){
+    document.getElementById('businesses-btn').addEventListener('click', function(){
+        // اگر قبلاً لود نشده
+        if (!document.getElementById('businesses-modal')) {
+            fetch('/businesses/modal')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('business-modal-container').innerHTML = html;
+                });
+        } else {
+            document.getElementById('businesses-modal').style.display = 'block';
+        }
     });
-    </script>
+    // بستن مودال
+    document.addEventListener('click', function(e){
+        if(e.target.id === 'close-businesses-modal' || e.target.className === 'businesses-modal-bg'){
+            document.getElementById('businesses-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+});
+</script>
