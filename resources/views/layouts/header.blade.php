@@ -57,8 +57,9 @@
     <div id="business-modal-container"></div>
 </nav>
 
-
+<div id="business-modal-container"></div>
 <link rel="stylesheet" href="{{ asset('css/businesses-modal.css') }}">
+<script src="{{ asset('js/businesses-modal.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('businesses-btn').addEventListener('click', function(){
@@ -68,12 +69,14 @@ document.addEventListener('DOMContentLoaded', function(){
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('business-modal-container').innerHTML = html;
+                    // بعد از لود، رویداد سفارشی اجرا کن تا اسکریپت modal اجرا شود
+                    document.dispatchEvent(new Event('businesses-modal-loaded'));
                 });
         } else {
             document.getElementById('businesses-modal').style.display = 'block';
         }
     });
-    // بستن مودال
+    // بستن مودال بیرونی
     document.addEventListener('click', function(e){
         if(e.target.id === 'close-businesses-modal' || e.target.className === 'businesses-modal-bg'){
             document.getElementById('businesses-modal').style.display = 'none';

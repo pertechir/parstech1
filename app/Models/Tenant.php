@@ -6,14 +6,9 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant
 {
-    protected $casts = [
-        'data' => 'array',
-    ];
-
-    // اگر بعداً خواستی ارتباط با User بزنی
-    public function user()
+    // اینجا می‌توانی متدها یا ارتباطات دیگر اضافه کنی
+    public function users()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsToMany(\App\Models\User::class, 'business_user', 'tenant_id', 'user_id');
     }
-    
 }
