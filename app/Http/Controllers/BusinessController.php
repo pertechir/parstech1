@@ -5,37 +5,56 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\Auth;
-use Stancl\Tenancy\TenantManager;
 
 class BusinessController extends Controller
 {
-    // نمایش لیست کسب‌وکارهای کاربر
     public function select()
     {
         $businesses = Auth::user()->businesses;
         return view('businesses.select', compact('businesses'));
     }
 
-    // سوییچ به کسب‌وکار انتخابی
     public function switch($tenant_id)
     {
         $tenant = Tenant::findOrFail($tenant_id);
 
-        // اعتبارسنجی مالکیت
         if (!Auth::user()->businesses->contains($tenant)) {
             abort(403, 'شما به این کسب‌وکار دسترسی ندارید.');
         }
 
-        // فعال‌سازی tenant
         tenancy()->initialize($tenant);
 
         session(['tenant_id' => $tenant_id]);
 
         return redirect()->route('dashboard');
     }
-    public function modal()
-{
-    $provinces = \App\Models\Province::all();
-    return view('businesses.modal', compact('provinces'));
-}
+
+    // نمایش فرم ایجاد کسب‌وکار جدید
+    public function create()
+    {
+        return view('businesses.create');
+    }
+
+    // ذخیره کسب‌وکار جدید و ساخت دیتابیس tenant
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $tenant = Tenant::create([
+            'id' => uniqid(), // یا هر الگویی که دوست داری
+            'data' => [
+                'name' => $request->name,
+            ],
+        ]);
+        // نسبت دادن کاربر به tenant
+        Auth::user()->businesses()->attach($tenant->id);
+
+        // ایجاد دیتابیس و اجرای مایگریشن
+        $tenant->createDatabase();
+        $tenant->runMigrations();
+
+        return redirect()->route('business.select')->with('success', 'کسب‌وکار جدید با موفقیت ایجاد شد.');
+    }
 }

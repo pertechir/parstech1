@@ -365,7 +365,8 @@ Route::get('/businesses/modal', [BusinessController::class, 'modal']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/businesses/select', [BusinessController::class, 'select'])->name('business.select');
     Route::get('/businesses/switch/{tenant_id}', [BusinessController::class, 'switch'])->name('business.switch');
-    // ساخت کسب‌وکار جدید و ... را هم اینجا اضافه خواهیم کرد
+    Route::get('/businesses/create', [BusinessController::class, 'create'])->name('business.create');
+    Route::post('/businesses/store', [BusinessController::class, 'store'])->name('business.store');
 });
 
 
