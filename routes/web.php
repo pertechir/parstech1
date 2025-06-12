@@ -360,8 +360,11 @@ Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)-
 
 Route::get('warehouses/{warehouse}/items', [WarehouseItemController::class, 'index'])->name('warehouse.items');
 
+Route::get('/businesses/modal', [BusinessController::class, 'showBusinessModal']);
+
 Route::get('/businesses/modal', [BusinessController::class, 'modal']);
 
+<<<<<<< HEAD
 Route::middleware(['auth'])->group(function () {
     Route::get('/businesses/select', [BusinessController::class, 'select'])->name('business.select');
     Route::get('/businesses/switch/{tenant_id}', [BusinessController::class, 'switch'])->name('business.switch');
@@ -369,5 +372,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/businesses/store', [BusinessController::class, 'store'])->name('business.store');
 });
 
+=======
+>>>>>>> parent of 3d6ff3e1 (2)
 
 require __DIR__.'/auth.php';
