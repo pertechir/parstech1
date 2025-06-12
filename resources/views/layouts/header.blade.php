@@ -3,7 +3,6 @@
         <a class="navbar-brand fw-bold" href="{{ url('/') }}">داشبورد</a>
         <div class="d-flex align-items-center ms-auto">
             <!-- دکمه کسب و کارها -->
-            @include('businesses.modal')
             <button id="businesses-btn" class="btn btn-outline-primary mx-2 d-flex align-items-center" type="button">
                 <i class="fas fa-briefcase me-1"></i>
                 کسب‌وکارها
@@ -55,12 +54,12 @@
             @endauth
         </div>
     </div>
+    <div id="business-modal-container"></div>
 </nav>
 
 <div id="business-modal-container"></div>
 <link rel="stylesheet" href="{{ asset('css/businesses-modal.css') }}">
 <script src="{{ asset('js/businesses-modal.js') }}"></script>
-<<<<<<< HEAD
 <script>
 document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('businesses-btn').addEventListener('click', function(){
@@ -86,5 +85,3 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 });
 </script>
-=======
->>>>>>> parent of 3d6ff3e1 (2)
