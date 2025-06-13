@@ -298,59 +298,6 @@
         $(document).on('click', function(e) {
             if(!$(e.target).closest('#customer_search').length) $('#customer-search-results').hide();
         });
-
-        // اصلاح اضافه شدن خدمات به فاکتور
-        // این کد فرض می‌کند دکمه + برای خدمات کلاس add-service دارد. اگر متفاوت است اطلاع بده.
-        $(document).on('click', '.add-service', function() {
-            let serviceId = $(this).data('id');
-            let name = $(this).data('name');
-            let price = $(this).data('price');
-            let count = 1;
-            // بررسی اگر قبلا اضافه شده بود تکرار نشود (می‌توانید این قسمت را بردارید یا تغییر دهید)
-            if ($('#invoice-items-table tbody tr[data-id="' + serviceId + '"]').length) {
-                Swal.fire({icon: 'warning', text: 'این خدمت قبلا اضافه شده است!'});
-                return;
-            }
-            // اضافه کردن به جدول
-            let row = `
-                <tr data-id="${serviceId}" data-type="service">
-                    <td>خدمت</td>
-                    <td>${name}</td>
-                    <td><input type="number" class="form-control item-count" value="${count}" min="1"></td>
-                    <td class="item-price">${price}</td>
-                    <td class="item-total">${price}</td>
-                    <td><button type="button" class="btn btn-danger btn-sm remove-btn"><i class="fa fa-times"></i></button></td>
-                </tr>
-            `;
-            $('#invoice-items-table tbody').append(row);
-            updateTotals();
-        });
-
-        // تابع محاسبه جمع کل
-        function updateTotals() {
-            let totalCount = 0;
-            let totalAmount = 0;
-            $('#invoice-items-table tbody tr').each(function(){
-                let count = parseInt($(this).find('.item-count').val());
-                let price = parseInt($(this).find('.item-price').text());
-                totalCount += count;
-                totalAmount += count * price;
-                $(this).find('.item-total').text(count * price);
-            });
-            $('#total_count').text(totalCount);
-            $('#total_amount').text(totalAmount.toLocaleString() + ' ریال');
-        }
-
-        // اصلاح جمع کل هنگام تغییر تعداد
-        $(document).on('input', '.item-count', function() {
-            updateTotals();
-        });
-
-        // حذف ردیف
-        $(document).on('click', '.remove-btn', function() {
-            $(this).closest('tr').remove();
-            updateTotals();
-        });
     });
     </script>
 @endsection
