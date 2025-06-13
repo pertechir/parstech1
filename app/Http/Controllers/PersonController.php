@@ -12,6 +12,21 @@ use App\Models\CustomerPurchase;
 
 class PersonController extends Controller
 {
+    public function edit($id)
+{
+    $person = \App\Models\Person::findOrFail($id);
+
+    // اگر لازم داری استان و شهر را هم بیاوری، اینجا اضافه کن
+    // مثلا:
+    // $provinces = Province::all();
+    // $cities = City::where('province_id', $person->province_id)->get();
+
+    return view('persons.edit', [
+        'person' => $person,
+        // 'provinces' => $provinces,
+        // 'cities' => $cities,
+    ]);
+}
     public function nextCode()
     {
         // فقط کدهایی که با persons=- شروع می‌شوند را درنظر بگیر

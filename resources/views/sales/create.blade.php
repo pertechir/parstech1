@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/sales-create.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
+        /* بهبود ظاهر و مدرن‌سازی */
         .sales-create-container {
             background: linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);
             border-radius: 20px;
@@ -37,9 +38,16 @@
         }
         .form-label.required:after {content:" *";color:#ef4444;font-weight:bold;}
         .grand-total { font-size: 1.7rem; color: #0ea5e9; font-weight: bold; }
-        .selected-products-table thead th { background: #e0f2fe; color: #1e293b; }
-        .selected-products-table tbody tr { transition: background .17s; }
-        .selected-products-table tbody tr:hover { background: #f1f5f9; }
+        .selected-products-table thead th {
+            background: #e0f2fe;
+            color: #1e293b;
+        }
+        .selected-products-table tbody tr {
+            transition: background .17s;
+        }
+        .selected-products-table tbody tr:hover {
+            background: #f1f5f9;
+        }
         .remove-btn { color: #ef4444; font-size: 1.7rem; cursor: pointer; }
         .invoice-totals {
             display: flex;
@@ -49,7 +57,6 @@
         }
         .total-label { color: #64748b; }
         .total-value { color: #0ea5e9; font-weight: bold; }
-        .dropdown-menu {max-height: 260px;overflow-y: auto;}
         .product-search-results {
             max-height: 300px;
             overflow-y: auto;
@@ -254,53 +261,33 @@
     <script src="{{ asset('js/sales-invoice.js') }}"></script>
     <script>
     $(function() {
-        // راه‌اندازی تاریخ جلالی با پلاگین
-        if (typeof persianDate !== "undefined" && typeof $.fn.persianDatepicker === "function") {
-            $('#issued_at_jalali').persianDatepicker({
-                format: 'YYYY/MM/DD',
-                initialValue: false,
-                autoClose: true,
-                toolbox: {calendarSwitch: {enabled: false}},
-                calendar: {persian: {locale: 'fa'}},
-                onSelect: function(unix){
-                    let pd = new persianDate(unix);
-                    $('#issued_at_jalali').val(pd.format('YYYY/MM/DD'));
-                }
-            });
-            // اگر مقدار اولیه لازم است
-            if(!$('#issued_at_jalali').val()){
-                var now = new persianDate();
-                $('#issued_at_jalali').val(now.format('YYYY/MM/DD'));
-            }
+        // تاریخ فاکتور
+        if (typeof persianDate !== "undefined") {
+            var now = new persianDate();
+            var jalali = now.format('YYYY/MM/DD');
+            $('#issued_at_jalali').val(jalali);
         } else {
-            // اگر پلاگین جلالی نبود تاریخ میلادی نمایش داده شود
             var date = new Date();
             var pad = n => n < 10 ? '0'+n : n;
             var miladi = date.getFullYear() + '-' + pad(date.getMonth()+1) + '-' + pad(date.getDate());
             $('#issued_at_jalali').val(miladi);
         }
-        $('#issued_at_jalali').prop('readonly', false).css('background', '#fff').css('cursor', 'pointer');
+        $('#issued_at_jalali').prop('readonly', true).css('background', '#eee').css('cursor', 'not-allowed');
 
-        // جستجوی ایجکس مشتری
+        // نمونه ایجکس جستجوی مشتری (اگر در js اصلیت نیست)
         $('#customer_search').on('input', function() {
             let val = $(this).val();
-            if(val.length < 1) { $('#customer-search-results').hide(); return; }
+            if(val.length < 2) { $('#customer-search-results').hide(); return; }
             $.get('/customers/ajax-list', {q: val, limit: 10}, function(data) {
                 let html = '';
                 if(data.length) {
                     data.forEach(function(c) {
-                        let name = (c.first_name ? c.first_name : '') + ' ' + (c.last_name ? c.last_name : '');
-                        let company = c.company_name ? ' - ' + c.company_name : '';
-                        let mobile = c.mobile ? ' <small class="text-muted">' + c.mobile + '</small>' : '';
-                        html += `<div class="dropdown-item" data-id="${c.id}">${name}${company}${mobile}</div>`;
+                        html += `<div class="dropdown-item" data-id="${c.id}">${c.first_name} ${c.last_name} <small class="text-muted">${c.mobile}</small></div>`;
                     });
                     $('#customer-search-results').html(html).show();
                 } else {
                     $('#customer-search-results').hide();
                 }
-            }).fail(function(xhr) {
-                $('#customer-search-results').hide();
-                alert('خطا در ارتباط با سرور یا دریافت اطلاعات مشتری! لطفا با پشتیبانی تماس بگیرید.');
             });
         });
         $(document).on('click', '#customer-search-results .dropdown-item', function() {
@@ -312,9 +299,58 @@
             if(!$(e.target).closest('#customer_search').length) $('#customer-search-results').hide();
         });
 
-        // اگر محصولات و خدمات با AJAX لود می‌شوند، لازم است sales-invoice.js و سایر اسکریپت‌ها لود شود
-        // اگر مشکلی در نمایش محصولات بود، مطمئن شو فایل sales-invoice.js وجود دارد و در مسیر public/js است و هیچ خطای 404 در کنسول نیست
-        // اگر لیست محصول/خدمت باز هم نمی‌آید، همینجا اطلاع بده تا کدهای AJAX آن بخش را هم بنویسم
+        // اصلاح اضافه شدن خدمات به فاکتور
+        // این کد فرض می‌کند دکمه + برای خدمات کلاس add-service دارد. اگر متفاوت است اطلاع بده.
+        $(document).on('click', '.add-service', function() {
+            let serviceId = $(this).data('id');
+            let name = $(this).data('name');
+            let price = $(this).data('price');
+            let count = 1;
+            // بررسی اگر قبلا اضافه شده بود تکرار نشود (می‌توانید این قسمت را بردارید یا تغییر دهید)
+            if ($('#invoice-items-table tbody tr[data-id="' + serviceId + '"]').length) {
+                Swal.fire({icon: 'warning', text: 'این خدمت قبلا اضافه شده است!'});
+                return;
+            }
+            // اضافه کردن به جدول
+            let row = `
+                <tr data-id="${serviceId}" data-type="service">
+                    <td>خدمت</td>
+                    <td>${name}</td>
+                    <td><input type="number" class="form-control item-count" value="${count}" min="1"></td>
+                    <td class="item-price">${price}</td>
+                    <td class="item-total">${price}</td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-btn"><i class="fa fa-times"></i></button></td>
+                </tr>
+            `;
+            $('#invoice-items-table tbody').append(row);
+            updateTotals();
+        });
+
+        // تابع محاسبه جمع کل
+        function updateTotals() {
+            let totalCount = 0;
+            let totalAmount = 0;
+            $('#invoice-items-table tbody tr').each(function(){
+                let count = parseInt($(this).find('.item-count').val());
+                let price = parseInt($(this).find('.item-price').text());
+                totalCount += count;
+                totalAmount += count * price;
+                $(this).find('.item-total').text(count * price);
+            });
+            $('#total_count').text(totalCount);
+            $('#total_amount').text(totalAmount.toLocaleString() + ' ریال');
+        }
+
+        // اصلاح جمع کل هنگام تغییر تعداد
+        $(document).on('input', '.item-count', function() {
+            updateTotals();
+        });
+
+        // حذف ردیف
+        $(document).on('click', '.remove-btn', function() {
+            $(this).closest('tr').remove();
+            updateTotals();
+        });
     });
     </script>
 @endsection

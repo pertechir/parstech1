@@ -294,11 +294,12 @@ Route::get('/sales/newform', function () {
     ]);
 })->name('sales.newform');
 
-// جستجوی ایجکس مشتری (سازگار با فارسی و همه کلمات)
+// جستجوی ایجکس مشتری (سازگار با فارسی)
+
+
 Route::get('/customers/ajax-list', function (\Illuminate\Http\Request $request) {
     $q = trim($request->input('q', ''));
     $limit = intval($request->input('limit', 10));
-
     $results = \App\Models\Person::query()
         ->where('type', 'customer')
         ->where(function($query) use ($q) {
@@ -311,10 +312,8 @@ Route::get('/customers/ajax-list', function (\Illuminate\Http\Request $request) 
         ->orderBy('first_name')
         ->limit($limit)
         ->get(['id', 'first_name', 'last_name', 'mobile', 'company_name']);
-
     return response()->json($results);
 });
-
 
 Route::get('persons/next-code', [PersonController::class, 'nextCode'])->name('persons.next-code');
 Route::resource('sales', SaleController::class);
@@ -360,5 +359,5 @@ Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)-
 Route::get('warehouses/{warehouse}/items', [WarehouseItemController::class, 'index'])->name('warehouse.items');
 
 Route::get('/businesses/modal', [BusinessController::class, 'modal']);
-
+Route::get('/sales/item-info', [\App\Http\Controllers\SaleController::class, 'itemInfo']);
 require __DIR__.'/auth.php';

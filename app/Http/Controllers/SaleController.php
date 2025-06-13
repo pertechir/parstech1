@@ -16,6 +16,29 @@ use PDF;
 
 class SaleController extends Controller
 {
+    public function itemInfo(Request $request)
+    {
+        $id = $request->get('id');
+        $type = $request->get('type');
+
+        if ($type == 'product') {
+            // محصولات فقط با id عددی
+            $item = Product::where('id', $id)->first();
+        } elseif ($type == 'service') {
+            // خدمات با id یا code (مثلاً services-1001)
+            $item = Product::where(function($query) use ($id) {
+                $query->where('id', $id)
+                      ->orWhere('code', $id);
+            })->where('type', 'service')->first();
+        } else {
+            return response()->json(['error' => 'نوع آیتم نامعتبر است.'], 400);
+        }
+
+        if (!$item) {
+            return response()->json(['error' => 'آیتم یافت نشد!'], 404);
+        }
+        return response()->json($item);
+    }
 
     public function nextInvoiceNumber()
     {

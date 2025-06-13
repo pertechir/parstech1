@@ -1,0 +1,153 @@
+body, .sales-create-container {
+    direction: rtl;
+    background: linear-gradient(120deg,#f0f4f9 0%,#fafffc 100%);
+    font-family: "Vazirmatn", "Tahoma", Arial, sans-serif;
+}
+.sales-create-container {
+    border-radius: 24px;
+    box-shadow: 0 10px 32px #0002;
+    margin: 40px auto 30px auto;
+    max-width: 1100px;
+    padding: 40px 28px 20px 28px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    position: relative;
+}
+.sales-create-header {
+    background: linear-gradient(90deg,#06b6d4 0%,#3b82f6 100%);
+    border-radius: 16px;
+    color: #fff;
+    padding: 24px 38px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 16px #06b6d44d;
+    display: flex; align-items: center; gap: 20px;
+    justify-content: flex-end;
+}
+.sales-create-header h2 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 1px;
+}
+.invoice-section {
+    background: #f8fafc;
+    border-radius: 18px;
+    box-shadow: 0 1px 14px #0001;
+    padding: 26px 26px 14px 26px;
+    margin-bottom: 22px;
+    transition: box-shadow .2s;
+    border: 1px solid #dbeafe;
+}
+.form-label.required:after {content:" *";color:#ef4444;font-weight:bold;}
+.grand-total { font-size: 1.6rem; color: #06b6d4; font-weight: bold; }
+.selected-products-table thead th {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: bold;
+}
+.selected-products-table tbody tr {
+    transition: background .17s;
+}
+.selected-products-table tbody tr:hover {
+    background: #f0fdfa;
+}
+.remove-btn { color: #ef4444; font-size: 1.5rem; cursor: pointer; }
+.invoice-totals {
+    display: flex;
+    gap: 44px;
+    align-items: center;
+    font-size: 1.1rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+.total-label { color: #64748b; }
+.total-value { color: #06b6d4; font-weight: bold; }
+.dropdown-menu {
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 8px 26px #22d3ee44;
+    border-radius: 12px;
+    border: 1px solid #bae6fd;
+    background: #fff;
+    right: 0;
+    left: unset !important;
+    z-index: 99;
+    position: absolute;
+}
+.dropdown-item {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-bottom: 1px solid #f0f4f8;
+    font-size: 1rem;
+    transition: background 0.2s;
+    text-align: right;
+}
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background: #f0fdfa; color: #2563eb; }
+.form-control, .form-select {
+    border-radius: 10px !important;
+    border: 1px solid #bae6fd !important;
+    font-size: 1rem;
+    padding: 10px 14px;
+    background: #fff;
+    transition: border .2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 0 2px #06b6d433;
+    background: #e0f2fe;
+}
+.input-group-text { background: #e0f2fe !important; border-radius: 10px !important; }
+.btn-primary {
+    background: linear-gradient(90deg,#06b6d4 0%,#3b82f6 100%);
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    padding: 12px 40px;
+    font-size: 1.15rem;
+    width: auto;
+}
+.btn-primary:hover {
+    background: linear-gradient(90deg,#3b82f6 0%,#06b6d4 100%);
+    box-shadow: 0 2px 10px #60a5fa44;
+}
+.btn-success {
+    background: linear-gradient(90deg,#22d3ee 0%,#2dd4bf 100%);
+    border: none;
+    border-radius: 10px;
+    font-size: 1.17rem;
+    font-weight: bold;
+    padding: 8px 16px;
+}
+.btn-success:hover {
+    background: linear-gradient(90deg,#2dd4bf 0%,#22d3ee 100%);
+    box-shadow: 0 2px 8px #22d3ee33;
+}
+.invoice-footer {
+    margin-top: 30px;
+}
+/* واکنشگرا برای موبایل و تبلت */
+@media (max-width: 900px) {
+    .sales-create-container {padding: 16px;}
+    .sales-create-header {padding: 15px;}
+    .invoice-section {padding: 10px;}
+    .invoice-totals {gap: 20px;}
+    .btn-primary {padding: 10px 18px; font-size: 1rem;}
+    .btn-success {padding: 8px 10px; font-size: 1rem;}
+    .grand-total {font-size: 1.25rem;}
+}
+@media (max-width: 700px) {
+    .sales-create-header h2 {font-size: 1.3rem;}
+    .invoice-section {padding: 4vw 2vw;}
+    .form-control, .form-select {font-size: 0.93rem; padding: 7px 8px;}
+    .dropdown-item {padding: 8px 10px; font-size: 0.92rem;}
+    .btn-primary {padding: 10px 6px; font-size: 1rem;}
+}
+@media (max-width: 540px) {
+    .sales-create-header {padding: 8px 8px;}
+    .invoice-totals {gap: 10px; font-size: 0.93rem;}
+    .btn-primary, .btn-success {width: 100%; display: block;}
+    .w-100-mobile {width: 100% !important;}
+    .text-center-mobile {text-align: center !important;}
+    .mt-3-mobile {margin-top: 13px !important;}
+}

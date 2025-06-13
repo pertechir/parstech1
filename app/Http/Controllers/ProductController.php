@@ -91,7 +91,7 @@ class ProductController extends Controller
             $default_code = 'product-' . ($lastNumber + 1);
         }
 
-        $categories = Category::all();
+        $categories = Category::where('category_type', 'product')->get();
         $brands = Brand::all();
         $units = Unit::all();
         $shareholders = Person::where('type', 'shareholder')->orderBy('full_name')->get();
