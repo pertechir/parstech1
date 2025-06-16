@@ -206,7 +206,7 @@
                                 <label class="form-label"><b>سهامداران و درصد سهم هرکدام</b></label>
                                 <div class="alert alert-light border shadow-sm mb-2">
                                     <small>
-                                        درصد سهام هرکدام را وارد کنید. اگر سهامداری در این خدمت سهم ندارد، مقدار را خالی بگذارید.
+                                        درصد سهام هرکدام را وارد کنید. اگر سهامداری در این خدمت سهم ندارد، مقدار را خالی بگذارید.<br>
                                         مجموع سهم‌ها باید حداکثر ۱۰۰ باشد.
                                     </small>
                                 </div>
@@ -258,34 +258,6 @@
                 </div>
             </form>
         </div>
-    </div>
-</div>
-
-<!-- Modal افزودن واحد جدید -->
-<div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="unit-form" class="modal-content" method="POST" action="{{ route('units.store') }}">
-            @csrf
-            <div class="modal-header">
-                <h5 class="modal-title" id="addUnitModalLabel">افزودن واحد جدید</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
-            </div>
-            <div class="modal-body">
-                <div id="unit-modal-alert" style="display:none"></div>
-                <div class="mb-3">
-                    <label class="form-label required">عنوان واحد</label>
-                    <input type="text" name="title" id="unit_title" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">توضیحات (اختیاری)</label>
-                    <input type="text" name="description" id="unit_description" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                <button type="submit" class="btn btn-primary">ثبت واحد</button>
-            </div>
-        </form>
     </div>
 </div>
 @endsection
@@ -360,49 +332,6 @@
         document.getElementsByName('customer_note')[0].addEventListener('input', updatePrintList);
 
         updatePrintList();
-
-        // --- افزودن واحد جدید ---
-        var addUnitBtn = document.getElementById('add-unit-btn');
-        var addUnitModal = new bootstrap.Modal(document.getElementById('addUnitModal'));
-        addUnitBtn.addEventListener('click', function() {
-            document.getElementById('unit_title').value = '';
-            document.getElementById('unit_description').value = '';
-            document.getElementById('unit-modal-alert').style.display = 'none';
-            addUnitModal.show();
-        });
-
-        document.getElementById('unit-form').addEventListener('submit', function(e){
-            e.preventDefault();
-            var form = this;
-            var formData = new FormData(form);
-            var alertBox = document.getElementById('unit-modal-alert');
-            alertBox.style.display = 'none';
-            fetch(form.action, {
-                method: 'POST',
-                headers: {'X-CSRF-TOKEN': formData.get('_token')},
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success){
-                    alertBox.className = 'alert alert-success';
-                    alertBox.innerText = data.message || 'واحد با موفقیت اضافه شد!';
-                    alertBox.style.display = 'block';
-                    setTimeout(function(){
-                        location.reload();
-                    }, 1200);
-                }else{
-                    alertBox.className = 'alert alert-danger';
-                    alertBox.innerText = data.message || 'خطا در افزودن واحد!';
-                    alertBox.style.display = 'block';
-                }
-            })
-            .catch(() => {
-                alertBox.className = 'alert alert-danger';
-                alertBox.innerText = 'خطا در ارتباط با سرور!';
-                alertBox.style.display = 'block';
-            });
-        });
     });
 
     function updatePrintList(){

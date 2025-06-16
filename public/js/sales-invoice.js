@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // شماره فاکتور اتوماتیک/دستی
     const invoiceNumberInput = document.getElementById('invoice_number');
     const invoiceNumberSwitch = document.getElementById('invoiceNumberSwitch');
-    let initialInvoiceNumber = invoiceNumberInput ? invoiceNumberInput.value : '';
+    let initialInvoiceNumber = invoiceNumberInput ? invoiceNumberInput.value : ''; // مقدار اولیه از blade
 
     if (invoiceNumberInput && invoiceNumberSwitch) {
         function setInvoiceNumberReadOnly(isAuto) {
@@ -98,17 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // نمایش لیست محصولات و خدمات
+    // بارگذاری و رندر لیست محصولات و خدمات
     ['product', 'service'].forEach(type => {
         function renderRows(items) {
             let html = '';
             items.forEach(item => {
-                // اگر id نبود و code وجود داشت (برای خدمات)، code را به عنوان شناسه استفاده کن
-                let id = '';
-                if (item.id) id = item.id;
-                else if (item.code) id = item.code; // فقط برای خدمات
-
-                let addBtn = `<button class="btn btn-success btn-sm add-product-btn" data-id="${id}" data-type="${type}"><i class="fa fa-plus"></i></button>`;
+                let addBtn = `<button class="btn btn-success btn-sm add-product-btn" data-id="${item.id}" data-type="${type}"><i class="fa fa-plus"></i></button>`;
                 html += `<tr>
                     <td>${addBtn}</td>
                     <td>${item.code ?? '-'}</td>
@@ -156,23 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             let id = String(btn.dataset.id).trim();
             let type = String(btn.dataset.type).trim();
-            if (!id || id === "null" || id === "undefined") {
-                showAlert('شناسه آیتم (محصول یا خدمت) نامعتبر است!');
-                return;
-            }
 
             fetch(`/sales/item-info?id=${id}&type=${type}`)
-                .then(response => {
-                    if (!response.ok) throw new Error("اطلاعات یافت نشد");
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(item => {
-                    // اینجا هم اگر id نبود، code را استفاده کن
-                    if (!item.id && item.code) item.id = item.code;
-                    if (!item || !item.id) {
-                        showAlert('اطلاعات آیتم دریافت نشد!');
-                        return;
-                    }
                     if (type === 'service') item.stock = 1;
                     let stock = parseInt(item.stock) || 0;
                     if (stock < 1) return;
@@ -210,11 +192,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // رندر جدول فاکتور
+    // رندر جدول فاکتور و کنترل شرط‌ها (حفظ فوکوس و کرسر)
     function renderInvoiceItemsTable() {
         let tbody = document.getElementById('invoice-items-body');
         if (!tbody) return;
 
+        // ذخیره input فوکوس‌شده و موقعیت کرسر
         let active = document.activeElement;
         let focusInfo = null;
         if (active && active.classList && typeof active.selectionStart === 'number') {
@@ -276,8 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <input type="number" class="form-control input-sm item-count-input" name="counts[]" value="${itemCount}" min="1" max="${itemStock}" data-idx="${idx}">
                 </td>
                 <td><input type="number" class="form-control input-sm item-price-input" name="unit_prices[]" value="${itemPrice}" min="0" step="1" data-idx="${idx}"></td>
-                <td><input type="number" class="form-control input-sm item-discount-input" name="discounts[]" value="${itemDiscount}" min="0" max="${itemCount*itemPrice}" step="0.01" data-idx="${idx}">
-                </td>
+                <td><input type="number" class="form-control input-sm item-discount-input" name="discounts[]" value="${itemDiscount}" min="0" max="${itemCount*itemPrice}" step="0.01" data-idx="${idx}"></td>
                 <td>
                     <input type="number" class="form-control input-sm item-tax-input" name="taxes[]" value="${itemTax}" min="0" max="100" step="0.01" data-idx="${idx}">
                     <span class="small">%</span>
@@ -353,6 +335,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ذخیره اقلام به input مخفی هنگام ثبت فرم
+    // پشتیبانی از هر دو فرم فروش معمولی و سریع
     let salesForm = document.getElementById('sales-invoice-form');
     let quickForm = document.getElementById('quick-sale-form');
     [salesForm, quickForm].forEach(function(frm){

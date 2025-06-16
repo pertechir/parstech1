@@ -294,26 +294,28 @@ Route::get('/sales/newform', function () {
     ]);
 })->name('sales.newform');
 
-// جستجوی ایجکس مشتری (سازگار با فارسی)
-
-
-Route::get('/customers/ajax-list', function (\Illuminate\Http\Request $request) {
-    $q = trim($request->input('q', ''));
-    $limit = intval($request->input('limit', 10));
-    $results = \App\Models\Person::query()
-        ->where('type', 'customer')
-        ->where(function($query) use ($q) {
-            $query->where('first_name', 'like', "%$q%")
-                ->orWhere('last_name', 'like', "%$q%")
-                ->orWhereRaw("CONCAT(first_name,' ',last_name) LIKE ?", ["%$q%"])
-                ->orWhere('mobile', 'like', "%$q%")
-                ->orWhere('company_name', 'like', "%$q%");
-        })
-        ->orderBy('first_name')
-        ->limit($limit)
-        ->get(['id', 'first_name', 'last_name', 'mobile', 'company_name']);
+Route::get('/customers/search', function (Request $request) {
+    $q = $request->get('q');
+    $results = Person::query()
+        ->where('first_name', 'LIKE', "%$q%")
+        ->orWhere('last_name', 'LIKE', "%$q%")
+        ->orWhere('nickname', 'LIKE', "%$q%")
+        ->orWhere('company_name', 'LIKE', "%$q%")
+        ->orWhere('accounting_code', 'LIKE', "%$q%")
+        ->limit(10)
+        ->get(['id', DB::raw("CONCAT(first_name, ' ', last_name) as name")]);
     return response()->json($results);
 });
+
+Route::get('/api/customers/search', function(Request $request) {
+    $q = $request->get('q');
+    $results = Person::query()
+        ->where('title', 'LIKE', "%$q%")
+        ->orWhere('company_name', 'LIKE', "%$q%")
+        ->limit(10)
+        ->get(['id', 'title as name']);
+    return response()->json($results);
+})->middleware(['web', 'auth']);
 
 Route::get('persons/next-code', [PersonController::class, 'nextCode'])->name('persons.next-code');
 Route::resource('sales', SaleController::class);
@@ -359,5 +361,5 @@ Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)-
 Route::get('warehouses/{warehouse}/items', [WarehouseItemController::class, 'index'])->name('warehouse.items');
 
 Route::get('/businesses/modal', [BusinessController::class, 'modal']);
-Route::get('/sales/item-info', [\App\Http\Controllers\SaleController::class, 'itemInfo']);
+
 require __DIR__.'/auth.php';

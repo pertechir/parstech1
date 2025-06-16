@@ -8,109 +8,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/dropzone@6.0.0-beta.2/dist/dropzone.css" />
     <link rel="stylesheet" href="{{ asset('css/persian-datepicker.min.css') }}">
-    <style>
-        .modal-category-bg {
-            display: none;
-            position: fixed;
-            z-index: 1400;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.28);
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-category-bg.active {display: flex;}
-        .modal-category-box {
-            background: #fff;
-            border-radius: 16px;
-            width: 98vw;
-            max-width: 430px;
-            min-width: 280px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 12px 40px #0002;
-            padding: 25px 18px 16px 18px;
-            margin: 0 auto;
-            animation: catmodalshow .24s cubic-bezier(.6,1.5,.6,1) both;
-        }
-        @keyframes catmodalshow {
-            from {transform: translateY(70px) scale(.93); opacity:.2;}
-            to   {transform: none; opacity:1;}
-        }
-        .modal-category-title {
-            font-size: 1.22rem;
-            font-weight: bold;
-            color: #2563eb;
-            margin-bottom: 13px;
-            text-align: right;
-        }
-        .category-search-box {
-            margin-bottom: 10px;
-        }
-        .category-search-input {
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #bae6fd;
-            padding: 8px 12px;
-            font-size: 1rem;
-            margin-bottom: 7px;
-        }
-        .category-scroll-list {
-            overflow-y: auto;
-            max-height: 38vh;
-            border-radius: 8px;
-            border: 1px solid #e0e7ef;
-            background: #f8fafc;
-            padding: 0;
-            margin: 0;
-            list-style: none;
-        }
-        .category-scroll-list li {
-            padding: 11px 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            transition: background 0.17s;
-            color: #334155;
-            text-align: right;
-        }
-        .category-scroll-list li:last-child {border-bottom: none;}
-        .category-scroll-list li:hover, .category-scroll-list li.selected {
-            background: #e0f2fe;
-            color: #0ea5e9;
-            font-weight: bold;
-        }
-        .modal-category-close {
-            position: absolute; left: 13px; top: 8px;
-            font-size: 1.55rem;
-            color: #e11d48;
-            cursor: pointer;
-            background: none;
-            border: none;
-            outline: none;
-        }
-        .category-selected-view {
-            background: #e0f2fe;
-            color: #2563eb;
-            padding: 7px 18px;
-            border-radius: 10px;
-            display: inline-block;
-            font-weight: bold;
-            min-width: 110px;
-            text-align: center;
-        }
-        .category-no-result {
-            color: #ef4444;
-            text-align: center;
-            padding: 15px 0 10px 0;
-        }
-        @media (max-width:600px){
-            .modal-category-box {max-width:97vw;min-width:0;padding:10px 4vw;}
-            .modal-category-title {font-size: 1rem;}
-            .category-scroll-list li {padding:7px 8px; font-size:0.95rem;}
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -179,24 +76,14 @@
                         <label class="form-label fw-bold"><i class="bi bi-cart-plus"></i> حداقل سفارش</label>
                         <input type="text" name="min_order_qty" class="form-control persian-number" value="{{ old('min_order_qty', 1) }}">
                     </div>
-                    <!-- دسته‌بندی محصول با پاپ‌آپ و جستجو -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-bold"><i class="bi bi-list-task"></i> دسته‌بندی <span class="text-danger">*</span></label>
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <span id="selected-category-view" class="category-selected-view">
-                                @php
-                                    $selectedCat = old('category_id') ? $categories->firstWhere('id', old('category_id')) : null;
-                                @endphp
-                                {{ $selectedCat ? $selectedCat->name : 'انتخاب نشده' }}
-                            </span>
-                            <button type="button" id="open-category-modal" class="btn btn-outline-primary">
-                                انتخاب دسته‌بندی
-                            </button>
-                        </div>
-                        <input type="hidden" name="category_id" id="category_id" value="{{ old('category_id') }}">
-                        @error('category_id')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
+                        <select name="category_id" class="form-select" required>
+                            <option value="">انتخاب کنید...</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" @if(old('category_id')==$cat->id) selected @endif>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-bold"><i class="bi bi-calendar3"></i> تاریخ انقضا (اختیاری)</label>
@@ -327,7 +214,7 @@
                                     <small>
                                         اگر هیچ سهامداری انتخاب نشود، سهم محصول به طور مساوی بین همه سهامداران تقسیم می‌شود.<br>
                                         اگر فقط یک نفر انتخاب شود، کل محصول برای او خواهد بود.<br>
-                                        اگر چند نفر انتخاب شوند، درصد هرکدام را وارد کنید (مجموع باید ۱۰۰ باشد، اگر خالی بگذارید، به طور مساوی تقسیم می‌شود).
+                                        اگر چند نفر انتخاب شوند، درصد هرکدام را وارد کنید (مجموع باید ۱۰۰ باشد، اگر خالی بگذارید به طور مساوی تقسیم می‌شود).
                                     </small>
                                 </div>
                                 @if($shareholders->count())
@@ -376,28 +263,6 @@
         </div>
     </div>
 </div>
-
-<!-- پاپ‌آپ دسته‌بندی با جستجو -->
-<div class="modal-category-bg" id="category-modal-bg">
-    <div class="modal-category-box">
-        <button type="button" class="modal-category-close" id="close-category-modal" title="بستن">&times;</button>
-        <div class="modal-category-title">انتخاب دسته‌بندی محصول</div>
-        <div class="category-search-box">
-            <input type="text" id="category-search" class="category-search-input" placeholder="جستجوی دسته‌بندی...">
-        </div>
-        <ul class="category-scroll-list" id="category-list">
-            @php
-                $productCategories = $categories->filter(function($cat){ return !isset($cat->type) || $cat->type == 'product'; });
-            @endphp
-            @foreach($productCategories as $cat)
-                <li data-id="{{ $cat->id }}">
-                    {{ $cat->name }}
-                </li>
-            @endforeach
-        </ul>
-        <div id="cat-no-result" class="category-no-result d-none">هیچ دسته‌ای پیدا نشد!</div>
-    </div>
-</div>
 @include('products.units-modal')
 @include('products.brand-modal')
 @endsection
@@ -412,51 +277,6 @@
     <script src="{{ asset('js/products-create-advanced.js') }}"></script>
     <script>
         $(function() {
-            // پاپ‌آپ دسته‌بندی
-            $('#open-category-modal').click(function(){
-                $('#category-modal-bg').addClass('active');
-                setTimeout(()=>{$('#category-search').focus();}, 200)
-            });
-            $('#close-category-modal').click(function(){
-                $('#category-modal-bg').removeClass('active');
-            });
-            $('#category-modal-bg').click(function(e){
-                if(e.target === this) $('#category-modal-bg').removeClass('active');
-            });
-            // انتخاب دسته
-            $('#category-list').on('click', 'li', function(){
-                let id = $(this).data('id');
-                let title = $(this).text();
-                $('#category_id').val(id);
-                $('#selected-category-view').text(title);
-                $('#category-modal-bg').removeClass('active');
-            });
-            // جستجو دسته‌بندی
-            $('#category-search').on('input', function(){
-                let val = $(this).val().trim().toLowerCase();
-                let found = false;
-                $('#category-list li').each(function(){
-                    let text = $(this).text().trim().toLowerCase();
-                    if(val === "" || text.includes(val)){
-                        $(this).show();
-                        found = true;
-                    }else{
-                        $(this).hide();
-                    }
-                });
-                $('#cat-no-result').toggleClass('d-none', found);
-            });
-
-            // فعال/غیرفعال کردن input درصد سهامدار
-            $('.shareholder-checkbox').on('change', function(){
-                let input = $('#percent-' + $(this).val());
-                if($(this).is(':checked')){
-                    input.prop('disabled', false);
-                }else{
-                    input.prop('disabled', true).val('');
-                }
-            });
-
             // تاریخ شمسی
             $('#expire_date_picker').persianDatepicker({
                 format: 'YYYY/MM/DD',
@@ -471,7 +291,6 @@
                 autoClose: true,
                 initialValue: false
             });
-
             // کنترل سوییچ کد کالا
             const codeSwitch = document.getElementById('code-edit-switch');
             const codeInput = document.getElementById('product-code');
@@ -489,6 +308,15 @@
                 codeInput.readOnly = true;
                 codeInput.value = codeDefault;
             }
+            // فعال/غیرفعال کردن input درصد سهامدار
+            $('.shareholder-checkbox').on('change', function(){
+                let input = $('#percent-' + $(this).val());
+                if($(this).is(':checked')){
+                    input.prop('disabled', false);
+                }else{
+                    input.prop('disabled', true).val('');
+                }
+            });
         });
     </script>
 @endsection

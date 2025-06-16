@@ -73,7 +73,7 @@ body {
     color: var(--primary);
     border-radius: var(--radius-full, 50px);
     font-size: .95em;
-    padding: .1em .7em
+    padding: .1em .7em;
     margin-left: .7em;
 }
 .section-body {
