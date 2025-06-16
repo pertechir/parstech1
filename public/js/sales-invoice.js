@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // شماره فاکتور اتوماتیک/دستی
     const invoiceNumberInput = document.getElementById('invoice_number');
     const invoiceNumberSwitch = document.getElementById('invoiceNumberSwitch');
-    let initialInvoiceNumber = invoiceNumberInput ? invoiceNumberInput.value : ''; // مقدار اولیه از blade
+    let initialInvoiceNumber = invoiceNumberInput ? invoiceNumberInput.value : '';
 
     if (invoiceNumberInput && invoiceNumberSwitch) {
         function setInvoiceNumberReadOnly(isAuto) {
@@ -107,10 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 html += `<tr>
                     <td>${addBtn}</td>
                     <td>${item.code ?? '-'}</td>
-                    <td>${item.name ?? '-'}</td>
+                    <td>${item.name ?? item.title ?? '-'}</td>
                     <td>${item.category ?? '-'}</td>
                     ${type === 'product' ? `<td>${item.stock ?? '-'}</td>` : ''}
-                    <td>${item.sell_price ? parseInt(item.sell_price).toLocaleString() : '-'}</td>
+                    <td>${item.sell_price ? parseInt(item.sell_price).toLocaleString() : (item.price ? parseInt(item.price).toLocaleString() : '-')}</td>
                     <td>${item.description ?? ''}</td>
                 </tr>`;
             });
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // افزودن محصول یا خدمت به فاکتور
+    // افزودن محصول یا خدمت به فاکتور (با محدودیت خدمات به تعداد 1)
     document.body.addEventListener('click', function (e) {
         if (e.target.closest('.add-product-btn')) {
             let btn = e.target.closest('.add-product-btn');
@@ -152,27 +152,58 @@ document.addEventListener("DOMContentLoaded", function () {
             let id = String(btn.dataset.id).trim();
             let type = String(btn.dataset.type).trim();
 
+            // اگر id خالی بود، خطا بده و هیچی انجام نده
+            if (!id || id === "null" || id === "undefined") {
+                showAlert('خطا در شناسه خدمت یا محصول! لطفا صفحه را رفرش کنید.');
+                return;
+            }
+
             fetch(`/sales/item-info?id=${id}&type=${type}`)
                 .then(response => response.json())
                 .then(item => {
-                    if (type === 'service') item.stock = 1;
+                    if (type === 'service') {
+                        item.name = item.name || item.title || '';
+                        item.sell_price = item.sell_price || item.price || 0;
+                        item.unit = item.unit || '';
+                        item.stock = 1; // خدمات فقط یک بار قابل افزودن هستند!
+                    }
                     let stock = parseInt(item.stock) || 0;
                     if (stock < 1) return;
                     let idx = invoiceItems.findIndex(x => x.id == id && x.type == type);
-                    if (idx > -1) {
-                        invoiceItems[idx].count += 1;
-                        renderInvoiceItemsTable();
-                        return;
+                    if (type === 'service') {
+                        if (idx > -1) {
+                            // فقط یک بار می‌تونی اضافه کنی! اگر هست، فقط تعدادش رو بذار 1
+                            invoiceItems[idx].count = 1;
+                            renderInvoiceItemsTable();
+                            return;
+                        } else {
+                            item.count = 1;
+                            item.id = id;
+                            item.type = type;
+                            item.desc = "";
+                            item.discount = 0;
+                            item.tax = 0;
+                            invoiceItems.push(item);
+                            renderInvoiceItemsTable();
+                            return;
+                        }
                     } else {
-                        item.count = 1;
-                        item.id = id;
-                        item.type = type;
-                        item.desc = "";
-                        item.discount = 0;
-                        item.tax = 0;
-                        invoiceItems.push(item);
-                        renderInvoiceItemsTable();
-                        return;
+                        // محصولات مثل قبل (تعداد بیشتر مجاز)
+                        if (idx > -1) {
+                            invoiceItems[idx].count += 1;
+                            renderInvoiceItemsTable();
+                            return;
+                        } else {
+                            item.count = 1;
+                            item.id = id;
+                            item.type = type;
+                            item.desc = "";
+                            item.discount = 0;
+                            item.tax = 0;
+                            invoiceItems.push(item);
+                            renderInvoiceItemsTable();
+                            return;
+                        }
                     }
                 })
                 .catch(() => showAlert('خطا در دریافت اطلاعات!'));
@@ -256,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td><input type="text" class="form-control input-sm item-desc-input" name="descs[]" value="${item.desc ?? ''}" data-idx="${idx}" maxlength="255"></td>
                 <td>${item.unit ?? ''}</td>
                 <td>
-                    <input type="number" class="form-control input-sm item-count-input" name="counts[]" value="${itemCount}" min="1" max="${itemStock}" data-idx="${idx}">
+                    <input type="number" class="form-control input-sm item-count-input" name="counts[]" value="${itemCount}" min="1" max="${itemStock}" data-idx="${idx}" ${item.type === 'service' ? 'readonly' : ''}>
                 </td>
                 <td><input type="number" class="form-control input-sm item-price-input" name="unit_prices[]" value="${itemPrice}" min="0" step="1" data-idx="${idx}"></td>
                 <td><input type="number" class="form-control input-sm item-discount-input" name="discounts[]" value="${itemDiscount}" min="0" max="${itemCount*itemPrice}" step="0.01" data-idx="${idx}"></td>
@@ -294,6 +325,11 @@ document.addEventListener("DOMContentLoaded", function () {
             let idx = parseInt(e.target.dataset.idx);
             let val = parseInt(e.target.value);
             let max = parseInt(invoiceItems[idx].stock || 1);
+            if (invoiceItems[idx].type === 'service') {
+                invoiceItems[idx].count = 1;
+                renderInvoiceItemsTable();
+                return;
+            }
             if (isNaN(val) || val < 1) {
                 showAlert('تعداد باید حداقل ۱ باشد.');
                 val = 1;
@@ -335,7 +371,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ذخیره اقلام به input مخفی هنگام ثبت فرم
-    // پشتیبانی از هر دو فرم فروش معمولی و سریع
     let salesForm = document.getElementById('sales-invoice-form');
     let quickForm = document.getElementById('quick-sale-form');
     [salesForm, quickForm].forEach(function(frm){

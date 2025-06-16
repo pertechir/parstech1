@@ -1,32 +1,20 @@
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>کد خدمات</th>
-            <th>عنوان خدمات</th>
-            <th>دسته‌بندی</th>
-            <th>واحد</th>
-            <th>قیمت</th>
-            <th>عملیات</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($services as $service)
-            <tr>
-                <td>{{ $service->service_code }}</td>
-                <td>{{ $service->title }}</td>
-                <td>{{ $service->category ? $service->category->name : '-' }}</td>
-                <td>{{ $service->unit }}</td>
-                <td>{{ number_format($service->price) }}</td>
-                <td>
-                    <button type="button" class="btn btn-success btn-sm add-service-btn"
-                        data-id="{{ $service->id }}"
-                        data-title="{{ $service->title }}"
-                        data-price="{{ $service->price }}"
-                        data-unit="{{ $service->unit }}">
-                        افزودن
-                    </button>
-                </td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
+@foreach($services as $service)
+<tr>
+    <td>
+        <button
+            type="button"
+            class="btn btn-success btn-sm add-product-btn"
+            data-id="{{ $service->id }}"
+            data-type="service"
+        >
+            <i class="fa fa-plus"></i>
+        </button>
+    </td>
+    <td>{{ $service->code ?? '-' }}</td>
+    <td>{{ $service->title ?? $service->name ?? '-' }}</td>
+    <td>{{ $service->category->name ?? '-' }}</td>
+    <td>{{ $service->price ? number_format($service->price) : '-' }}</td>
+    <td>{{ $service->unit ?? '-' }}</td>
+    <td>{{ $service->description ?? '' }}</td>
+</tr>
+@endforeach
