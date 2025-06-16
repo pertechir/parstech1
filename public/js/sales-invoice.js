@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // شماره فاکتور اتوماتیک/دستی
     const invoiceNumberInput = document.getElementById('invoice_number');
     const invoiceNumberSwitch = document.getElementById('invoiceNumberSwitch');
     let initialInvoiceNumber = invoiceNumberInput ? invoiceNumberInput.value : '';
@@ -55,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // جستجوی مشتری
     const customerSearchInput = document.getElementById("customer_search");
     const customerSearchResults = document.getElementById("customer-search-results");
     const customerIdInput = document.getElementById("customer_id");
@@ -98,7 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // بارگذاری و رندر لیست محصولات و خدمات
     ['product', 'service'].forEach(type => {
         function renderRows(items) {
             let html = '';
@@ -143,7 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // افزودن محصول یا خدمت به فاکتور (با محدودیت خدمات به تعداد 1)
     document.body.addEventListener('click', function (e) {
         if (e.target.closest('.add-product-btn')) {
             let btn = e.target.closest('.add-product-btn');
@@ -152,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
             let id = String(btn.dataset.id).trim();
             let type = String(btn.dataset.type).trim();
 
-            // اگر id خالی بود، خطا بده و هیچی انجام نده
             if (!id || id === "null" || id === "undefined") {
                 showAlert('خطا در شناسه خدمت یا محصول! لطفا صفحه را رفرش کنید.');
                 return;
@@ -165,14 +160,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         item.name = item.name || item.title || '';
                         item.sell_price = item.sell_price || item.price || 0;
                         item.unit = item.unit || '';
-                        item.stock = 1; // خدمات فقط یک بار قابل افزودن هستند!
+                        item.stock = 1;
                     }
                     let stock = parseInt(item.stock) || 0;
                     if (stock < 1) return;
                     let idx = invoiceItems.findIndex(x => x.id == id && x.type == type);
                     if (type === 'service') {
                         if (idx > -1) {
-                            // فقط یک بار می‌تونی اضافه کنی! اگر هست، فقط تعدادش رو بذار 1
                             invoiceItems[idx].count = 1;
                             renderInvoiceItemsTable();
                             return;
@@ -188,7 +182,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             return;
                         }
                     } else {
-                        // محصولات مثل قبل (تعداد بیشتر مجاز)
                         if (idx > -1) {
                             invoiceItems[idx].count += 1;
                             renderInvoiceItemsTable();
@@ -210,7 +203,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // حذف ردیف از فاکتور
     document.body.addEventListener('click', function (e) {
         if (e.target.closest('.remove-invoice-item')) {
             e.preventDefault();
@@ -223,12 +215,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // رندر جدول فاکتور و کنترل شرط‌ها (حفظ فوکوس و کرسر)
     function renderInvoiceItemsTable() {
         let tbody = document.getElementById('invoice-items-body');
         if (!tbody) return;
 
-        // ذخیره input فوکوس‌شده و موقعیت کرسر
         let active = document.activeElement;
         let focusInfo = null;
         if (active && active.classList && typeof active.selectionStart === 'number') {
@@ -317,7 +307,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // کنترل شرط‌ها روی ورودی‌های جدول
     document.body.addEventListener('input', function (e) {
         let classList = e.target.classList;
 
@@ -370,7 +359,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ذخیره اقلام به input مخفی هنگام ثبت فرم
     let salesForm = document.getElementById('sales-invoice-form');
     let quickForm = document.getElementById('quick-sale-form');
     [salesForm, quickForm].forEach(function(frm){
