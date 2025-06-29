@@ -1,0 +1,105 @@
+/* Animation Classes */
+.animate__animated {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.animate__fadeIn {
+    animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Custom Styles */
+.preview-card {
+    transition: all 0.3s ease;
+    background: linear-gradient(145deg, #ffffff, #f6f8fd);
+    border: 1px solid #e3e6f0;
+}
+
+.preview-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.preview-avatar {
+    background: linear-gradient(45deg, #4e73df, #36b9cc);
+}
+
+.bank-account-row {
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-account-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: #4e73df;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.bank-account-row:hover::before {
+    opacity: 1;
+}
+
+.nav-pills .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-pills .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #4e73df;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-pills .nav-link.active::after {
+    width: 100%;
+}
+
+.form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78,115,223,0.25);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #1cc88a, #36b9cc);
+    border: none;
+    box-shadow: 0 4px 15px rgba(28,200,138,0.2);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #e74a3b, #be2617);
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .preview-card {
+        margin-bottom: 2rem;
+    }
+
+    .nav-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills .nav-link {
+        white-space: nowrap;
+    }
+}
