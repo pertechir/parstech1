@@ -393,22 +393,43 @@ Route::get('/api/persons/check-code', function (Request $request) {
 Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
 Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
-// حسابداری شخصی
-Route::prefix('personal-accounting')->name('personal_accounting.')->group(function () {
+// صفحه اصلی حسابداری شخصی
+Route::prefix('personal-accounting')->name('personal_accounting.')->middleware(['auth'])->group(function () {
+    // نمایش صفحه اصلی
     Route::get('/', [PersonalAccountingController::class, 'index'])->name('index');
+
+    // جستجوی اشخاص
     Route::get('/ajax-search-person', [PersonalAccountingController::class, 'searchPerson'])->name('ajax_search_person');
+
+    // افزودن شخص به حسابداری
     Route::post('/add-person', [PersonalAccountingController::class, 'addPerson'])->name('add_person');
+
+    // حذف شخص از حسابداری
     Route::delete('/remove-person/{person}', [PersonalAccountingController::class, 'removePerson'])->name('remove_person');
+
+    // پشتیبان‌گیری و بازیابی
     Route::get('/export', [PersonalAccountingController::class, 'exportData'])->name('export');
     Route::post('/import', [PersonalAccountingController::class, 'importData'])->name('import');
+
+    // یادآورها
     Route::post('/add-reminder', [PersonalAccountingController::class, 'addReminder'])->name('add_reminder');
 
-    // روت‌های جدید برای بخش‌های دیگر
+    // مشاهده پروفایل شخص
+    Route::get('/person/{person}', [PersonalAccountingController::class, 'showPerson'])->name('person');
+
+    // ثبت تراکنش جدید
+    Route::post('/person/{person}/transactions', [PersonalAccountingController::class, 'addTransaction'])
+        ->name('person.add_transaction');
+
+    // حذف تراکنش
+    Route::delete('/person/{person}/transactions/{transaction}', [PersonalAccountingController::class, 'deleteTransaction'])
+        ->name('person.delete_transaction');
+
+    // بخش‌های دیگر
     Route::get('/categories', [PersonalAccountingController::class, 'categories'])->name('categories');
     Route::get('/budgets', [PersonalAccountingController::class, 'budgets'])->name('budgets');
     Route::get('/reports', [PersonalAccountingController::class, 'reports'])->name('reports');
     Route::get('/reminders', [PersonalAccountingController::class, 'reminders'])->name('reminders');
     Route::get('/accounts', [PersonalAccountingController::class, 'accounts'])->name('accounts');
 });
-
 require __DIR__.'/auth.php';

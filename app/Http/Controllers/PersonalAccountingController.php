@@ -145,4 +145,43 @@ class PersonalAccountingController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+    public function showPerson(Person $person)
+{
+    // محاسبه آمار مخصوص این شخص
+    $transactions = $person->transactions;
+
+    $totalIncome = $transactions->whereIn('type', ['income', 'receive', 'credit'])
+        ->sum('amount');
+
+    $totalExpense = $transactions->whereIn('type', ['expense', 'pay', 'debt'])
+        ->sum('amount');
+
+    $totalDebt = $transactions->where('type', 'debt')->sum('amount');
+
+    $thisMonth = Carbon::now()->startOfMonth();
+    $thisMonthTransactions = $transactions->where('created_at', '>=', $thisMonth);
+
+    $thisMonthIncome = $thisMonthTransactions->whereIn('type', ['income', 'receive', 'credit'])
+        ->sum('amount');
+
+    $thisMonthExpense = $thisMonthTransactions->whereIn('type', ['expense', 'pay', 'debt'])
+        ->sum('amount');
+
+    $totalBalance = $totalIncome - $totalExpense;
+
+    $hasDebt = $transactions->where('type', 'debt')->where('created_at', '>=', Carbon::now()->subMonths(3))->count() > 0;
+
+    return view('personal_accounting.person', compact(
+        'person',
+        'transactions',
+        'totalIncome',
+        'totalExpense',
+        'totalDebt',
+        'totalBalance',
+        'thisMonthIncome',
+        'thisMonthExpense',
+        'hasDebt'
+    ));
+}
 }
