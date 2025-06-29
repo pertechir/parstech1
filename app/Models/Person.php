@@ -15,7 +15,7 @@ class Person extends Model
         'accounting_code','total_purchases', 'last_transaction_at', 'total_sales', 'balance', 'status','type', 'first_name', 'last_name', 'nickname', 'credit_limit', 'price_list', 'tax_type',
         'national_code', 'economic_code', 'registration_number', 'branch_code', 'description', 'address', 'country',
         'province', 'city', 'postal_code', 'phone', 'mobile', 'fax', 'phone1', 'phone2', 'phone3', 'email', 'website',
-        'birth_date', 'marriage_date', 'join_date', 'company_name', 'title'
+        'birth_date', 'marriage_date','personal_accounting', 'join_date', 'company_name', 'title'
     ];
 
     protected $casts = [
@@ -25,6 +25,15 @@ class Person extends Model
         'last_transaction_at' => 'datetime',
     ];
 
+    /**
+     * ارتباط بین شخص و تراکنش‌ها
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    
 
     protected $appends = ['display_name'];
 

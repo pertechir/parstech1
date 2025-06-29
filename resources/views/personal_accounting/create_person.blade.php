@@ -11,7 +11,7 @@
         </h2>
         <a href="{{ route('personal_accounting.people') }}" class="btn btn-secondary">بازگشت به لیست اشخاص</a>
     </div>
-    <form method="post" action="{{ route('personal_accounting.people.store') }}" class="card p-4 shadow-sm">
+    <form method="post" action="{{ route('personal_accounting.create_person.store') }}" class="card p-4 shadow-sm">
         @csrf
         <div class="mb-3">
             <label class="form-label">نام</label>

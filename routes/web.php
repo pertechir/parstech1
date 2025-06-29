@@ -35,8 +35,8 @@ use App\Http\Controllers\Api\ServiceApiController;
 
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\BackupController;
-
-
+use App\Models\Seller;
+use App\Models\Transaction;
 
 
 
@@ -393,18 +393,78 @@ Route::get('/api/persons/check-code', function (Request $request) {
 Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
 Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
+
+// صفحه اصلی حسابداری شخصی
 Route::get('/personal-accounting', function () {
-    return view('personal_accounting.index');
+    $people = \App\Models\Person::where('personal_accounting', true)->orderByDesc('created_at')->get();
+    return view('personal_accounting.index', compact('people'));
 })->name('personal_accounting.index');
 
-Route::post('/personal-accounting/people/store', function(\Illuminate\Http\Request $request) {
+// حذف شخص از حسابداری شخصی
+Route::delete('/personal-accounting/remove-person/{person}', function(\App\Models\Person $person) {
+    $person->personal_accounting = false;
+    $person->save();
+    return redirect()->route('personal_accounting.index')->with('success', 'شخص با موفقیت از حسابداری حذف شد.');
+})->name('personal_accounting.remove_person');
+// جستجوی اشخاص (بدون role)
+Route::get('/personal-accounting/ajax-search-person', function(\Illuminate\Http\Request $request) {
+    $q = $request->input('q');
+    $query = \App\Models\Person::query();
+
+    // اگر سرچ هست فقط بر اساس نام و نام خانوادگی جستجو کن
+    if($q) {
+        $query->where(function($sub) use ($q) {
+            $sub->where('first_name', 'like', "%$q%")
+                ->orWhere('last_name', 'like', "%$q%")
+                ->orWhereRaw("concat(first_name, ' ', last_name) like ?", ["%$q%"]);
+        });
+    }
+    $list = $query->limit(10)->get(['id', 'first_name', 'last_name', 'mobile']);
+    return response()->json($list);
+})->name('personal_accounting.ajax_search_person');
+
+// افزودن شخص به حسابداری شخصی (ajax)
+Route::post('/personal-accounting/add-person', function(\Illuminate\Http\Request $request){
+    $id = $request->input('person_id');
+    $person = \App\Models\Person::findOrFail($id);
+    $person->personal_accounting = true;
+    $person->save();
+    return response()->json(['success'=>true]);
+})->name('personal_accounting.add_person');
+
+// صفحه نمایش پروفایل حسابداری هر شخص
+Route::get('/personal-accounting/person/{person}', function (Person $person) {
+    // فرض: مدل Person یک رابطه transactions دارد
+    $transactions = $person->transactions()->orderByDesc('created_at')->get();
+    return view('personal_accounting.person', compact('person', 'transactions'));
+})->name('personal_accounting.person');
+
+// ثبت تراکنش جدید برای شخص (POST)
+Route::post('/personal-accounting/person/{person}/transactions', function (Request $request, Person $person) {
     $request->validate([
-        'first_name' => 'required|max:64',
-        'last_name'  => 'required|max:64',
-        'mobile'     => 'nullable|max:20',
+        'type'   => 'required|in:income,expense,receive,pay,debt,credit',
+        'amount' => 'required|numeric|min:1',
+        'description' => 'nullable|max:255'
     ]);
-    \App\Models\Person::create($request->only(['first_name','last_name','mobile']));
-    return redirect()->route('personal_accounting.people')->with('success', 'شخص جدید اضافه شد.');
-})->name('personal_accounting.people.store');
+
+    // فرض: Person یک رابطه transactions دارد و مدل Transaction ساخته شده
+    $person->transactions()->create([
+        'type' => $request->type,
+        'amount' => $request->amount,
+        'description' => $request->description,
+    ]);
+
+    return redirect()->route('personal_accounting.person', $person->id)
+                     ->with('success', 'تراکنش با موفقیت ثبت شد.');
+})->name('personal_accounting.person.add_transaction');
+
+// حذف تراکنش
+Route::delete('/personal-accounting/person/{person}/transactions/{trx}', function(Person $person, Transaction $trx) {
+    if($trx->person_id == $person->id){
+        $trx->delete();
+        return back()->with('success','تراکنش حذف شد.');
+    }
+    return back()->with('error','تراکنش یافت نشد.');
+})->name('personal_accounting.person.delete_transaction');
 
 require __DIR__.'/auth.php';
