@@ -35,8 +35,8 @@ use App\Http\Controllers\Api\ServiceApiController;
 
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\BackupController;
-use App\Models\Seller;
-use App\Models\Transaction;
+use App\Http\Controllers\PersonalAccountingController;
+
 
 
 
@@ -393,78 +393,22 @@ Route::get('/api/persons/check-code', function (Request $request) {
 Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
 Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
 
+// حسابداری شخصی
+Route::prefix('personal-accounting')->name('personal_accounting.')->group(function () {
+    Route::get('/', [PersonalAccountingController::class, 'index'])->name('index');
+    Route::get('/ajax-search-person', [PersonalAccountingController::class, 'searchPerson'])->name('ajax_search_person');
+    Route::post('/add-person', [PersonalAccountingController::class, 'addPerson'])->name('add_person');
+    Route::delete('/remove-person/{person}', [PersonalAccountingController::class, 'removePerson'])->name('remove_person');
+    Route::get('/export', [PersonalAccountingController::class, 'exportData'])->name('export');
+    Route::post('/import', [PersonalAccountingController::class, 'importData'])->name('import');
+    Route::post('/add-reminder', [PersonalAccountingController::class, 'addReminder'])->name('add_reminder');
 
-// صفحه اصلی حسابداری شخصی
-Route::get('/personal-accounting', function () {
-    $people = \App\Models\Person::where('personal_accounting', true)->orderByDesc('created_at')->get();
-    return view('personal_accounting.index', compact('people'));
-})->name('personal_accounting.index');
-
-// حذف شخص از حسابداری شخصی
-Route::delete('/personal-accounting/remove-person/{person}', function(\App\Models\Person $person) {
-    $person->personal_accounting = false;
-    $person->save();
-    return redirect()->route('personal_accounting.index')->with('success', 'شخص با موفقیت از حسابداری حذف شد.');
-})->name('personal_accounting.remove_person');
-// جستجوی اشخاص (بدون role)
-Route::get('/personal-accounting/ajax-search-person', function(\Illuminate\Http\Request $request) {
-    $q = $request->input('q');
-    $query = \App\Models\Person::query();
-
-    // اگر سرچ هست فقط بر اساس نام و نام خانوادگی جستجو کن
-    if($q) {
-        $query->where(function($sub) use ($q) {
-            $sub->where('first_name', 'like', "%$q%")
-                ->orWhere('last_name', 'like', "%$q%")
-                ->orWhereRaw("concat(first_name, ' ', last_name) like ?", ["%$q%"]);
-        });
-    }
-    $list = $query->limit(10)->get(['id', 'first_name', 'last_name', 'mobile']);
-    return response()->json($list);
-})->name('personal_accounting.ajax_search_person');
-
-// افزودن شخص به حسابداری شخصی (ajax)
-Route::post('/personal-accounting/add-person', function(\Illuminate\Http\Request $request){
-    $id = $request->input('person_id');
-    $person = \App\Models\Person::findOrFail($id);
-    $person->personal_accounting = true;
-    $person->save();
-    return response()->json(['success'=>true]);
-})->name('personal_accounting.add_person');
-
-// صفحه نمایش پروفایل حسابداری هر شخص
-Route::get('/personal-accounting/person/{person}', function (Person $person) {
-    // فرض: مدل Person یک رابطه transactions دارد
-    $transactions = $person->transactions()->orderByDesc('created_at')->get();
-    return view('personal_accounting.person', compact('person', 'transactions'));
-})->name('personal_accounting.person');
-
-// ثبت تراکنش جدید برای شخص (POST)
-Route::post('/personal-accounting/person/{person}/transactions', function (Request $request, Person $person) {
-    $request->validate([
-        'type'   => 'required|in:income,expense,receive,pay,debt,credit',
-        'amount' => 'required|numeric|min:1',
-        'description' => 'nullable|max:255'
-    ]);
-
-    // فرض: Person یک رابطه transactions دارد و مدل Transaction ساخته شده
-    $person->transactions()->create([
-        'type' => $request->type,
-        'amount' => $request->amount,
-        'description' => $request->description,
-    ]);
-
-    return redirect()->route('personal_accounting.person', $person->id)
-                     ->with('success', 'تراکنش با موفقیت ثبت شد.');
-})->name('personal_accounting.person.add_transaction');
-
-// حذف تراکنش
-Route::delete('/personal-accounting/person/{person}/transactions/{trx}', function(Person $person, Transaction $trx) {
-    if($trx->person_id == $person->id){
-        $trx->delete();
-        return back()->with('success','تراکنش حذف شد.');
-    }
-    return back()->with('error','تراکنش یافت نشد.');
-})->name('personal_accounting.person.delete_transaction');
+    // روت‌های جدید برای بخش‌های دیگر
+    Route::get('/categories', [PersonalAccountingController::class, 'categories'])->name('categories');
+    Route::get('/budgets', [PersonalAccountingController::class, 'budgets'])->name('budgets');
+    Route::get('/reports', [PersonalAccountingController::class, 'reports'])->name('reports');
+    Route::get('/reminders', [PersonalAccountingController::class, 'reminders'])->name('reminders');
+    Route::get('/accounts', [PersonalAccountingController::class, 'accounts'])->name('accounts');
+});
 
 require __DIR__.'/auth.php';
