@@ -390,5 +390,21 @@ Route::get('/api/persons/check-code', function (Request $request) {
     return response()->json(['available' => !$exists]);
 });
 
+Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+
+Route::get('/personal-accounting', function () {
+    return view('personal_accounting.index');
+})->name('personal_accounting.index');
+
+Route::post('/personal-accounting/people/store', function(\Illuminate\Http\Request $request) {
+    $request->validate([
+        'first_name' => 'required|max:64',
+        'last_name'  => 'required|max:64',
+        'mobile'     => 'nullable|max:20',
+    ]);
+    \App\Models\Person::create($request->only(['first_name','last_name','mobile']));
+    return redirect()->route('personal_accounting.people')->with('success', 'شخص جدید اضافه شد.');
+})->name('personal_accounting.people.store');
 
 require __DIR__.'/auth.php';

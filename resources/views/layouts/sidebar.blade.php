@@ -325,6 +325,12 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('personal_accounting.index') }}">
+                            <i class="fas fa-wallet me-2"></i>
+                            حسابداری شخصی
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>

@@ -1,0 +1,62 @@
+.personal-accounting-container {
+    padding: 2rem;
+    background: #f9fafb;
+}
+.dashboard-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+.dashboard-card {
+    flex: 1;
+    min-width: 200px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(60,72,88,0.07);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow .2s;
+}
+.dashboard-card:hover {
+    box-shadow: 0 4px 24px rgba(60,72,88,0.12);
+}
+.card-icon {
+    font-size: 2.2rem;
+    margin-bottom: .7rem;
+}
+.card-income .card-icon { color: #16a34a; }
+.card-expense .card-icon { color: #dc2626; }
+.card-balance .card-icon { color: #0ea5e9; }
+.card-title {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: .4rem;
+}
+.card-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #222;
+    font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+}
+
+#transactions-table tbody tr td {
+    vertical-align: middle;
+}
+#transactions-table .badge-income {
+    background: #16a34a;
+    color: #fff;
+}
+#transactions-table .badge-expense {
+    background: #dc2626;
+    color: #fff;
+}
+.btn-close {
+    float: left;
+}
+
+@media (max-width: 900px) {
+    .dashboard-cards { flex-direction: column; }
+}

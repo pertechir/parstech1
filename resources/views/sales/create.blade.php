@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="{{ asset('css/persianDatepicker-melon.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sales-invoice.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sales-create.css') }}">
+
+        <link rel="stylesheet" href="{{ asset('css/sales-advanced.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <style>
         /* Quick Fixes - برای حفظ سازگاری با کدهای قبلی */
         .form-switch .slider {
